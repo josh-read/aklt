@@ -119,8 +119,7 @@ ax[1].set_xlabel("Level Index")
 ax[0].legend(loc='upper right')
 ax[1].legend(loc='lower right')
 
-
-fig.savefig("/Users/josh/OneDrive - University of Leeds/QMBP/theta_spectrum.pdf")
+fig.show()
 
 #%% Plot energy gap versus theta
 
@@ -147,6 +146,4 @@ ax.set_xlabel(r"$\theta/\pi$")
 plt.axvspan(0, 0.25, facecolor='k', alpha=0.1)
 plt.axvspan(1.25, 2, facecolor='k', alpha=0.1)
 
-#plt.style.use("ggplot")
-
-fig.savefig("/Users/josh/OneDrive - University of Leeds/QMBP/theta_vs_egap.pdf")
+fig.show()
