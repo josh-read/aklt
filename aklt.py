@@ -4,9 +4,10 @@
 import numpy as np
 from scipy.linalg import eigh
 import matplotlib.pyplot as plt
+import timeit
 
 def tensor(op_list):
-    """Finds tensor product of a list of operators"""
+    """Finds tensor product of a list of operators."""
     product = np.eye(1, dtype=np.complex) # Initialise product as a 1x1 I matrix
     for op in op_list:
         product = np.kron(product, op)
@@ -14,16 +15,27 @@ def tensor(op_list):
 
 
 def aklt(N, closed=True, costheta=1., sintheta=1./3):
-    """N: number of spins in the chain.
-    closed: is the spin chain periodic or not.
-    costheta, sintheta: can be used to set the biquadratic coupling constant."""
+    """Returns the energy spectrum of a spin chain of N spins.
+
+    N: number of spins in the chain
+    closed: is the spin chain periodic or not (represents a change in topology)
+    costheta, sintheta: can be used to set the biquadratic coupling constant"""
 
     # Define the operators (normalised prefactors)
-   
-    si = np.eye(3, dtype=np.complex) # Identity matrix
-    sx = np.sqrt(1./2)*np.array([[0,1,0],[1,0,1],[0,1,0]],dtype=np.complex) # Pauli x matrix
-    sy = -1j*np.sqrt(1./2)*np.array([[0,1,0],[-1,0,1],[0,-1,0]],dtype=np.complex) # Pauli y matrix
-    sz = np.array([[1,0,0],[0,0,0],[0,0,-1]],dtype=np.complex) # Pauli z matrix
+
+    # Identity matrix
+    si = np.eye(3, dtype=np.complex)
+    # Pauli x matrix
+    sx = np.sqrt(1/2) *
+            np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]],
+                     dtype=np.complex)
+    # Pauli y matrix
+    sy = -1j * np.sqrt(1/2) *
+            np.array([[0, 1, 0],[-1, 0, 1],[0, -1, 0]],
+                     dtype=np.complex)
+    # Pauli z matrix
+    sz = np.array([[1, 0, 0], [0, 0, 0], [0, 0, -1]],
+                  dtype=np.complex)
     
     # Calculate sx, sy and sx operators for all positions in the chain
     # E.g for the 2nd spin on a 4 spin chain: I.Sx.I.I
@@ -69,6 +81,7 @@ def aklt(N, closed=True, costheta=1., sintheta=1./3):
         
     return np.sort(eigh(H)[0])
 
+"""
 def open_vs_closed():
 
     # Print the lowest 10 energy levels for closed chain
@@ -147,3 +160,4 @@ plt.axvspan(0, 0.25, facecolor='k', alpha=0.1)
 plt.axvspan(1.25, 2, facecolor='k', alpha=0.1)
 
 fig.show()
+"""
