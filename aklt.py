@@ -4,84 +4,77 @@
 import numpy as np
 from scipy.linalg import eigh
 import matplotlib.pyplot as plt
-import timeit
+
+
+# Define the operators (normalised prefactors)
+SI = np.eye(3, dtype=np.complex)
+SX = (np.sqrt(1/2) *
+      np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]], dtype=np.complex))
+SY = (-1j * np.sqrt(1/2) *
+      np.array([[0, 1, 0], [-1, 0, 1], [0, -1, 0]], dtype=np.complex))
+SZ = (np.sqrt(1/2) *
+      np.array([[1, 0, 0], [0, 0, 0], [0, 0, -1]], dtype=np.complex))
+
 
 def tensor(op_list):
     """Finds tensor product of a list of operators."""
-    product = np.eye(1, dtype=np.complex) # Initialise product as a 1x1 I matrix
+    # Initialise product as a 1x1 I matrix
+    product = np.eye(1, dtype=np.complex)
     for op in op_list:
         product = np.kron(product, op)
     return product
 
 
-def aklt(N, closed=True, costheta=1., sintheta=1./3):
+def aklt(n, closed=True, costheta=1., sintheta=1./3):
     """Returns the energy spectrum of a spin chain of N spins.
 
     N: number of spins in the chain
     closed: is the spin chain periodic or not (represents a change in topology)
     costheta, sintheta: can be used to set the biquadratic coupling constant"""
 
-    # Define the operators (normalised prefactors)
-
-    # Identity matrix
-    si = np.eye(3, dtype=np.complex)
-    # Pauli x matrix
-    sx = np.sqrt(1/2) *
-            np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]],
-                     dtype=np.complex)
-    # Pauli y matrix
-    sy = -1j * np.sqrt(1/2) *
-            np.array([[0, 1, 0],[-1, 0, 1],[0, -1, 0]],
-                     dtype=np.complex)
-    # Pauli z matrix
-    sz = np.array([[1, 0, 0], [0, 0, 0], [0, 0, -1]],
-                  dtype=np.complex)
-    
     # Calculate sx, sy and sx operators for all positions in the chain
     # E.g for the 2nd spin on a 4 spin chain: I.Sx.I.I
 
     sx_list = []
     sy_list = []
     sz_list = []
-    
+
     # For each position in the chain
-    for j in range(N):
+    for j in range(n):
         # Initialise list of identity matrices
-        op_list = [si]*N
-        
+        op_list = [SI]*n
+
         # Replace jth identity matrix with Pauli x matrix
-        op_list[j] = sx
+        op_list[j] = SX
         # Calculate tensor product of all matrices in the list
         sx_list.append(tensor(op_list))
-        
+
         # Repeat for other Pauli matrices
-        op_list[j] = sy
+        op_list[j] = SY
         sy_list.append(tensor(op_list))
-        
-        op_list[j] = sz
+
+        op_list[j] = SZ
         sz_list.append(tensor(op_list))
-    
-    # Set the condition for an open or closed chain
-    Noc = N if closed else N-1
-    
+
     # Initialise Hamiltonian
-    H = 0     
+    h = 0
 
     # Sum each spin's contribution to the Hamiltonian
-    for j in range(Noc):
-        a, b = j, (j+1) % N # Gets the index of j and j+1, returning to 0 at j=n+1
-        
-        s_dot_s = 0 # Initialise S_j.S_j+1
-        
+    for j in range(n if closed else n-1):
+        # Get the index of j and j+1, returning to 0 at j=n+1
+        a, b = j, (j+1) % n
+
+        s_dot_s = 0  # Initialise S_j.S_j+1
+
         s_dot_s += np.dot(sx_list[a], sx_list[b])
         s_dot_s += np.dot(sy_list[a], sy_list[b])
         s_dot_s += np.dot(sz_list[a], sz_list[b])
-        
-        H += costheta * s_dot_s + sintheta * np.dot(s_dot_s, s_dot_s)
-        
-    return np.sort(eigh(H)[0])
 
-"""
+        h += costheta * s_dot_s + sintheta * np.dot(s_dot_s, s_dot_s)
+
+    return np.sort(eigh(h)[0])
+
+
 def open_vs_closed():
 
     # Print the lowest 10 energy levels for closed chain
@@ -95,7 +88,6 @@ def open_vs_closed():
     print(np.round(aklt_open[:10], 2))
 
     # Plot energy spectra
-
     fig, ax = plt.subplots()
 
     ax.plot(aklt_closed[:10], 'ks--', label='Closed')
@@ -105,8 +97,13 @@ def open_vs_closed():
     ax.set_xlabel("Level Index")
     ax.legend()
 
-    fig.show()
 
+if __name__ == '__main__':
+    open_vs_closed()
+    plt.show()
+
+
+"""
 #%% Plot energy spectrum at range of theta
 
 fig, ax = plt.subplots(1, 2, figsize=(10, 5), constrained_layout=True)
