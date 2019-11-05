@@ -98,63 +98,79 @@ def open_vs_closed():
     ax.legend()
 
 
-if __name__ == '__main__':
-    open_vs_closed()
-    plt.show()
+def theta_dependance():
+    """Plot energy spectrum at range of theta."""
 
+    fig, ax = plt.subplots(1, 2, figsize=(10, 5), constrained_layout=True)
 
-"""
-#%% Plot energy spectrum at range of theta
+    theta = np.linspace(0, np.pi, 9)
 
-fig, ax = plt.subplots(1, 2, figsize=(10, 5), constrained_layout=True)
+    marker = ['x', '+', 'v', '^', '<', '>', 's', 'D', 'o']
 
-theta = np.linspace(0, np.pi, 9)
+    for i in range(len(theta)):
+        spectrum = aklt(4,
+                        True,
+                        costheta=np.cos(theta[i]),
+                        sintheta=np.sin(theta[i]))
+        ax[0].plot(spectrum[:7],
+                   marker=marker[i],
+                   color='k',
+                   ls=':',
+                   mfc='none',
+                   label=str(i)+r'$\pi$/'+str(len(theta)-1))
 
-marker = ['x', '+', 'v', '^', '<', '>', 's', 'D', 'o']
+    theta = np.linspace(np.pi, 2*np.pi, 9)
 
-for i in range(len(theta)):
-    spectrum = aklt(4, True, costheta=np.cos(theta[i]), sintheta=np.sin(theta[i]))
-    ax[0].plot(spectrum[:7], marker=marker[i], color='k', ls=':', mfc='none', label=str(i)+r'$\pi$/'+str(len(theta)-1))
+    for i in range(len(theta)):
+        spectrum = aklt(4,
+                        True,
+                        costheta=np.cos(theta[i]),
+                        sintheta=np.sin(theta[i]))
+        ax[1].plot(spectrum[:7],
+                   marker=marker[i],
+                   color='k',
+                   ls=':',
+                   mfc='none',
+                   label=str(8+i)+r'$\pi$/'+str(len(theta)-1))
 
-theta = np.linspace(np.pi, 2*np.pi, 9)
+    ax[0].set_ylabel("Energy")
+    ax[1].set_ylabel("Energy")
+    ax[0].set_xlabel("Level Index")
+    ax[1].set_xlabel("Level Index")
+    ax[0].legend(loc='upper right')
+    ax[1].legend(loc='lower right')
 
-for i in range(len(theta)):
-    spectrum = aklt(4, True, costheta=np.cos(theta[i]), sintheta=np.sin(theta[i]))
-    ax[1].plot(spectrum[:7], marker=marker[i], color='k', ls=':', mfc='none', label=str(8+i)+r'$\pi$/'+str(len(theta)-1))
-
-ax[0].set_ylabel("Energy")
-ax[1].set_ylabel("Energy")
-ax[0].set_xlabel("Level Index")
-ax[1].set_xlabel("Level Index")
-ax[0].legend(loc='upper right')
-ax[1].legend(loc='lower right')
-
-fig.show()
-
-#%% Plot energy gap versus theta
 
 def gap(theta, closed):
     costheta = np.cos(theta)
     sintheta = np.sin(theta)
-    levels = aklt(5, closed, costheta, sintheta)
+    levels = aklt(4, closed, costheta, sintheta)
     return levels[1] - levels[0]
+
 
 vgap = np.vectorize(gap)
 
-theta = np.linspace(0, 2*np.pi, 100)
 
-gap_closed = vgap(theta, True)
-gap_open = vgap(theta, False)
+def energy_gap_vs_theta():
 
-fig, ax = plt.subplots()
+    theta = np.linspace(0, 2*np.pi, 100)
 
-ax.plot(theta/np.pi, gap_closed, color='k')
+    gap_closed = vgap(theta, True)
+    #  gap_open = vgap(theta, False)
 
-ax.set_ylabel(r"$\Delta{}E$")
-ax.set_xlabel(r"$\theta/\pi$")
+    fig, ax = plt.subplots()
 
-plt.axvspan(0, 0.25, facecolor='k', alpha=0.1)
-plt.axvspan(1.25, 2, facecolor='k', alpha=0.1)
+    ax.plot(theta/np.pi, gap_closed, color='k')
 
-fig.show()
-"""
+    ax.set_ylabel(r"$\Delta{}E$")
+    ax.set_xlabel(r"$\theta/\pi$")
+
+    plt.axvspan(0, 0.25, facecolor='k', alpha=0.1)
+    plt.axvspan(1.25, 2, facecolor='k', alpha=0.1)
+
+
+if __name__ == '__main__':
+    open_vs_closed()
+    theta_dependance()
+    energy_gap_vs_theta()
+    plt.show()
